@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.habitapp.R
 import com.dicoding.habitapp.data.Habit
+import com.dicoding.habitapp.ui.random.RandomHabitAdapter
+import java.util.Locale
 
 class HabitAdapter(
     private val onClick: (Habit) -> Unit
@@ -42,6 +44,19 @@ class HabitAdapter(
             itemView.setOnClickListener {
                 onClick(habit)
             }
+
+            val priorityLevel = RandomHabitAdapter.PageType.valueOf(
+                habit.priorityLevel.uppercase(
+                    Locale.ROOT
+                )
+            )
+            ivPriority.setImageResource(
+                when (priorityLevel) {
+                    RandomHabitAdapter.PageType.HIGH -> R.drawable.ic_priority_high
+                    RandomHabitAdapter.PageType.LOW -> R.drawable.ic_priority_low
+                    RandomHabitAdapter.PageType.MEDIUM -> R.drawable.ic_priority_medium
+                }
+            )
         }
 
     }

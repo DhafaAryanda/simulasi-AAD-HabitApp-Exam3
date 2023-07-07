@@ -12,22 +12,10 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "habits")
 data class Habit(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
     val id: Int = 0,
-
-    @ColumnInfo(name = "title")
-    @NonNull
     val title: String,
-
-    @ColumnInfo(name = "minutesFocus")
-    @NonNull
     val minutesFocus: Long,
-
-    @ColumnInfo(name = "startTime")
-    @NonNull
     val startTime: String,
-
-    @ColumnInfo(name = "priorityLevel")
-    @NonNull
     val priorityLevel: String
 ): Parcelable
+

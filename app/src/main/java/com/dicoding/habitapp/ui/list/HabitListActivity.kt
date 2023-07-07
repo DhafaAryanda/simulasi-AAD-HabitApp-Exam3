@@ -30,7 +30,6 @@ class HabitListActivity : AppCompatActivity() {
     private lateinit var viewModel: HabitListViewModel
     private lateinit var habitAdapter: HabitAdapter
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_habit_list)
@@ -43,10 +42,7 @@ class HabitListActivity : AppCompatActivity() {
 
         //TODO 6 : Initiate RecyclerView with LayoutManager
         recycler = findViewById(R.id.rv_habit)
-        recycler.apply {
-            setHasFixedSize(true)
-            layoutManager = GridLayoutManager(this@HabitListActivity, 2)
-        }
+        recycler.layoutManager = GridLayoutManager(this, 2)
 
         initAction()
 
