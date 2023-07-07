@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.habitapp.R
 import com.dicoding.habitapp.data.Habit
+import com.dicoding.habitapp.setting.SettingsActivity
 import com.dicoding.habitapp.ui.ViewModelFactory
 import com.dicoding.habitapp.ui.add.AddHabitActivity
 import com.dicoding.habitapp.ui.detail.DetailHabitActivity
+import com.dicoding.habitapp.ui.random.RandomHabitActivity
 import com.dicoding.habitapp.utils.Event
 import com.dicoding.habitapp.utils.HABIT_ID
 import com.dicoding.habitapp.utils.HabitSortType
@@ -54,7 +56,8 @@ class HabitListActivity : AppCompatActivity() {
         //TODO 7 : Submit pagedList to adapter and add intent to detail
         habitAdapter = HabitAdapter {
             startActivity(
-                Intent(this, DetailHabitActivity::class.java).putExtra(HABIT_ID, it.id))
+                Intent(this, DetailHabitActivity::class.java).putExtra(HABIT_ID, it.id)
+            )
         }
         recycler.adapter = habitAdapter
         viewModel.habits.observe(this) { habitAdapter.submitList(it) }
@@ -62,7 +65,6 @@ class HabitListActivity : AppCompatActivity() {
         viewModel.snackbarText.observe(this) {
             showSnackBar(it)
         }
-    }
     }
 
     //TODO 15 : Fixing bug : Menu not show and SnackBar not show when list is deleted using swipe
@@ -72,16 +74,24 @@ class HabitListActivity : AppCompatActivity() {
             findViewById(R.id.coordinator_layout),
             getString(message),
             Snackbar.LENGTH_SHORT
-        ).setAction("Undo"){
+        ).setAction("Undo") {
             viewModel.insert(viewModel.undo.value?.getContentIfNotHandled() as Habit)
         }.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_filter -> showFilteringPopUpMenu()
+            R.id.action_settings ->
+                startActivity(Intent(this, SettingsActivity::class.java))
+            R.id.action_random ->
+                startActivity(Intent(this, RandomHabitActivity::class.java))
+        }
         return true
     }
 
