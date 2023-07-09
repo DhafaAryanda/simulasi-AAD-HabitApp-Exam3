@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.dicoding.habitapp.R
@@ -29,36 +30,61 @@ class CountDownActivity : AppCompatActivity() {
         val viewModel = ViewModelProvider(this).get(CountDownViewModel::class.java)
 
         //TODO 10 : Set initial time and observe current time. Update button state when countdown is finished
-        viewModel.setInitialTime(habit.minutesFocus)
-        val tvCurrentTime = findViewById<TextView>(R.id.tv_count_down)
-        viewModel.currentTimeString.observe(this) {
-            tvCurrentTime.text = it
-        }
+        viewModel
+            .setInitialTime(habit.minutesFocus)
+        viewModel
+            .currentTimeString
+            .observe(this) { time ->
+                findViewById<TextView>(R.id.tv_count_down).text = time
+            }
 
         //TODO 13 : Start and cancel One Time Request WorkManager to notify when time is up.
-        viewModel.eventCountDownFinish.observe(this) {
-            updateButtonState(!it)
+        val workManager = WorkManager
+            .getInstance(applicationContext)
 
-            val builder = OneTimeWorkRequestBuilder<NotificationWorker>().apply {
-                setInputData(
-                    Data.Builder()
-                        .putInt(HABIT_ID, habit.id)
-                        .putString(HABIT_TITLE, habit.title)
-                        .build()
-                )
+        val inputData = Data
+            .Builder()
+            .apply {
+                putInt(HABIT_ID, habit.id)
+                putString(HABIT_TITLE, habit.title)
             }.build()
-            WorkManager.getInstance(this).enqueue(builder)
-        }
 
-        findViewById<Button>(R.id.btn_start).setOnClickListener {
-            viewModel.startTimer()
-            updateButtonState(true)
-        }
+        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInputData(inputData)
+            .build()
 
-        findViewById<Button>(R.id.btn_stop).setOnClickListener {
-            viewModel.resetTimer()
-            updateButtonState(false)
-        }
+
+        viewModel.eventCountDownFinish
+            .observe(this) { isCountDownFinished ->
+                if (isCountDownFinished == true) {
+                    updateButtonState(false)
+                    workManager
+                        .enqueueUniqueWork(
+                            habit.id
+                                .toString(),
+                            ExistingWorkPolicy
+                                .REPLACE, workRequest
+                        )
+                }
+            }
+
+        findViewById<Button>(R.id.btn_start)
+            .setOnClickListener {
+                viewModel
+                    .startTimer()
+                updateButtonState(true)
+            }
+
+        findViewById<Button>(R.id.btn_stop)
+            .setOnClickListener {
+                viewModel
+                    .resetTimer()
+                workManager
+                    .cancelUniqueWork(habit.id
+                        .toString())
+                updateButtonState(false)
+            }
+
     }
 
     private fun updateButtonState(isRunning: Boolean) {
