@@ -39,27 +39,41 @@ class RandomHabitAdapter(
         HIGH, MEDIUM, LOW
     }
 
-    inner class PagerViewHolder internal constructor(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-        //TODO 14 : Create view and bind data to item view
+    inner class PagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // TODO 14: Create view and bind data to item view
 
         fun bind(pageType: PageType, pageData: Habit) {
-            itemView.findViewById<TextView>(R.id.pager_tv_title).text = pageData.title
-            itemView.findViewById<TextView>(R.id.pager_tv_start_time).text = pageData.startTime
-            itemView.findViewById<TextView>(R.id.pager_tv_minutes).text = pageData.minutesFocus.toString()
+            val titleTextView = itemView
+                .findViewById<TextView>(R.id.pager_tv_title)
+            titleTextView.text = pageData.title
 
-            val priority = when(pageType){
-                PageType.HIGH -> R.drawable.ic_priority_high
-                PageType.MEDIUM -> R.drawable.ic_priority_medium
-                PageType.LOW -> R.drawable.ic_priority_low
+            val startTimeTextView = itemView
+                .findViewById<TextView>(R.id.pager_tv_start_time)
+            startTimeTextView.text = pageData.startTime
+
+            val priorityImageView = itemView
+                .findViewById<ImageView>(R.id.item_priority_level)
+            val priorityDrawableRes = when (pageType) {
+                PageType
+                    .HIGH -> R.drawable.ic_priority_high
+                PageType
+                    .MEDIUM -> R.drawable.ic_priority_medium
+                PageType
+                    .LOW -> R.drawable.ic_priority_low
             }
+            priorityImageView
+                .setImageResource(priorityDrawableRes)
 
-            itemView.findViewById<ImageView>(R.id.item_priority_level).setImageResource (priority)
+            val openCountDownButton = itemView
+                .findViewById<Button>(R.id.btn_open_count_down)
+            openCountDownButton
+                .setOnClickListener { onClick(pageData) }
 
-            itemView.findViewById<Button>(R.id.btn_open_count_down).setOnClickListener {
-                onClick(pageData)
-            }
-
+            val minutesTextView = itemView
+                .findViewById<TextView>(R.id.pager_tv_minutes)
+            minutesTextView.text = pageData.minutesFocus
+                .toString()
         }
+
     }
 }
